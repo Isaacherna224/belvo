@@ -15,14 +15,13 @@ class Formulario extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Crear un objeto con los datos del formulario
     const data = {
       nombrecompleto: this.state.nombrecompleto,
       correo: this.state.correo,
       contrasenia: this.state.contrasenia,
     };
 
-    // Configurar el SDK de AWS
+    // SDK de AWS
     AWS.config.update({
       accessKeyId: 'AKIASAGINZXX4AWBIUO7',
       secretAccessKey: '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',
@@ -31,19 +30,18 @@ class Formulario extends Component {
 
     const sqs = new AWS.SQS();
 
-    // Configurar el mensaje a enviar
+    // Mensaje a enviar
     const params = {
       MessageBody: JSON.stringify(data),
       QueueUrl: 'https://sqs.us-east-2.amazonaws.com/137859288559/LambdaRDSQueue',
     };
 
-    // Enviar el mensaje a la cola
+    // Enviar el mensaje
     sqs.sendMessage(params, (err, data) => {
       if (err) {
         console.error('Error al enviar el mensaje a la cola SQS', err);
       } else {
         console.log('Mensaje enviado a la cola SQS', data);
-        // Puedes realizar acciones adicionales aquí, como mostrar una confirmación al usuario.
       }
     });
   };

@@ -1,49 +1,77 @@
 import React, { Component } from 'react';
+import axios from 'axios'; 
 
 class Login extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: '',
-      password: ''
-    };
-  }
+  state = {
+    correo: '',
+    contrasenia: '',
+    alerta: '', 
+  };
 
-  handleUsernameChange = (e) => {
-    this.setState({ username: e.target.value });
-  }
+  handleInput = (e) => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
 
-  handlePasswordChange = (e) => {
-    this.setState({ password: e.target.value });
-  }
-
-  handleSubmit = (e) => {
+  
+  loginSubmit = async (e) => {
     e.preventDefault();
-    // Aquí puedes agregar la lógica para enviar los datos del inicio de sesión al servidor.
-  }
+  
+    // datos del login
+    const data = {
+      correo: this.state.correo,
+      contrasenia: this.state.contrasenia,
+    };
+  
+    // URL del endpoint
+    const url = 'https://b14lv7trlb.execute-api.us-east-2.amazonaws.com/lambda_get_user';
+  
+    // Realizar la solicitud GET
+    try {
+      const response = await axios.get(url, {
+        params: data,
+      });
+      console.log('Respuesta de la solicitud:', response);
+  
+      const statusCode = response.headers['status']; 
+  
+      if (statusCode === '200') {
+        this.setState({ alerta: 'Éxito' });
+  
+        console.log('Datos de la respuesta:', response.data);
+      } else if (statusCode === '404') {
+        this.setState({ alerta: 'Error: No se encontraron registros que cumplan con los criterios.' });
+      } else {
+        this.setState({ alerta: 'Error: Código de estado desconocido' });
+      }
+    } catch (error) {
+      console.error('Error al realizar la solicitud:', error);
+  
+      this.setState({ alerta: 'Error: Hubo un problema en la solicitud' });
+    }
+  }; 
+  
+  
 
   render() {
     return (
       <div>
-        <h2>Iniciar Sesión</h2>
-        <form onSubmit={this.handleSubmit}>
-          <div>
-            <label>Nombre de usuario:</label>
-            <input
-              type="text"
-              value={this.state.username}
-              onChange={this.handleUsernameChange}
-            />
-          </div>
-          <div>
-            <label>Contraseña:</label>
-            <input
-              type="password"
-              value={this.state.password}
-              onChange={this.handlePasswordChange}
-            />
-          </div>
-          <button type="submit">Iniciar Sesión</button>
+        {this.state.alerta && (
+          <div className="alert">{this.state.alerta}</div>
+        )}
+        <form onSubmit={this.loginSubmit}>
+          <input
+            type="email"
+            name="correo"
+            placeholder="Correo Electrónico"
+            onChange={this.handleInput}
+          />
+          <input
+            type="password"
+            name="contrasenia"
+            placeholder="Contraseña"
+            onChange={this.handleInput}
+          />
+          <button type="submit">Login</button>
         </form>
       </div>
     );

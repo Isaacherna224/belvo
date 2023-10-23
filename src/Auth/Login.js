@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios'; 
+import { useHistory } from 'react-router-dom';
+const history = useHistory();
 
 class Login extends Component {
   state = {
@@ -16,39 +18,34 @@ class Login extends Component {
   loginSubmit = async (e) => {
     e.preventDefault();
   
-    // datos del login
+   
     const data = {
       correo: this.state.correo,
       contrasenia: this.state.contrasenia,
     };
   
-    // URL del endpoint
+
     const url = 'https://b14lv7trlb.execute-api.us-east-2.amazonaws.com/lambda_get_user';
   
-    // Realizar la solicitud GET
+
     try {
-      const response = await axios.get(url, {
+      const response = await axios.get(url, { 
         params: data,
       });
-      console.log('Respuesta de la solicitud:', response);
+      console.log('Respuesta de la solicitud:', response.data);
   
-      const statusCode = response.headers['status']; 
-  
-      if (statusCode === '200') {
+      if (response.data.id) {
         this.setState({ alerta: 'Éxito' });
-  
-        console.log('Datos de la respuesta:', response.data);
-      } else if (statusCode === '404') {
-        this.setState({ alerta: 'Error: No se encontraron registros que cumplan con los criterios.' });
+        history.push('/institutions');
       } else {
-        this.setState({ alerta: 'Error: Código de estado desconocido' });
+        this.setState({ alerta: 'No se encontraron registros que cumplan con los criterios.' });
       }
     } catch (error) {
-      console.error('Error al realizar la solicitud:', error);
-  
-      this.setState({ alerta: 'Error: Hubo un problema en la solicitud' });
+      console.error('Error al realizar la solicitud:', error);  
+      this.setState({ alerta: 'Error' });
     }
-  }; 
+  };
+  
   
   
 

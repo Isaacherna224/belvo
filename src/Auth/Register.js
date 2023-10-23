@@ -37,7 +37,7 @@ class Formulario extends Component {
     };
 
     // Enviar el mensaje
-    sqs.sendMessage(params, (err, data) => {
+    sqs.sendMessage(params, (err, data) => { 
       if (err) {
         console.error('Error al enviar el mensaje a la cola SQS', err);
       } else {

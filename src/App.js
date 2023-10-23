@@ -6,7 +6,7 @@ import Register from './Auth/Register';
 
 function Home() {
   return (
-    <div>
+    <div> 
       <h1>Bienvenido</h1>
       <Link to="login">Iniciar Sesión</Link>
       <br></br>

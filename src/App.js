@@ -10,7 +10,7 @@ function Home() {
       <h1>Bienvenido</h1>
       <Link to="login">Iniciar Sesión</Link>
       <br></br>
-      <Link to="register">Registrarse</Link>
+      <Link to="register">Registrarr un nuevo usuario</Link>
       <hr />
       <Outlet />
     </div>

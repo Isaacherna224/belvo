@@ -1,66 +1,78 @@
 import React, { Component } from 'react';
+import AWS from 'aws-sdk';
 
-class Register extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: '',
-      email: '',
-      password: ''
-    };
-  }
+class Formulario extends Component {
+  state = {
+    nombrecompleto: '',
+    correo: '',
+    contrasenia: '',
+  };
 
-  handleUsernameChange = (e) => {
-    this.setState({ username: e.target.value });
-  }
+  handleInputChange = (e) => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
 
-  handleEmailChange = (e) => {
-    this.setState({ email: e.target.value });
-  }
-
-  handlePasswordChange = (e) => {
-    this.setState({ password: e.target.value });
-  }
-
-  handleSubmit = (e) => {
+  handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí puedes agregar la lógica para enviar los datos de registro al servidor.
-  }
+
+    // Crear un objeto con los datos del formulario
+    const data = {
+      nombrecompleto: this.state.nombrecompleto,
+      correo: this.state.correo,
+      contrasenia: this.state.contrasenia,
+    };
+
+    // Configurar el SDK de AWS
+    AWS.config.update({
+      accessKeyId: 'AKIASAGINZXX4AWBIUO7',
+      secretAccessKey: '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',
+      region: 'us-east-1', // Cambia a tu región de preferencia
+    });
+
+    const sqs = new AWS.SQS();
+
+    // Configurar el mensaje a enviar
+    const params = {
+      MessageBody: JSON.stringify(data),
+      QueueUrl: 'https://sqs.us-east-2.amazonaws.com/137859288559/LambdaRDSQueue',
+    };
+
+    // Enviar el mensaje a la cola
+    sqs.sendMessage(params, (err, data) => {
+      if (err) {
+        console.error('Error al enviar el mensaje a la cola SQS', err);
+      } else {
+        console.log('Mensaje enviado a la cola SQS', data);
+        // Puedes realizar acciones adicionales aquí, como mostrar una confirmación al usuario.
+      }
+    });
+  };
 
   render() {
     return (
-      <div>
-        <h2>Registro</h2>
-        <form onSubmit={this.handleSubmit}>
-          <div>
-            <label>Nombre de usuario:</label>
-            <input
-              type="text"
-              value={this.state.username}
-              onChange={this.handleUsernameChange}
-            />
-          </div>
-          <div>
-            <label>Correo electrónico:</label>
-            <input
-              type="email"
-              value={this.state.email}
-              onChange={this.handleEmailChange}
-            />
-          </div>
-          <div>
-            <label>Contraseña:</label>
-            <input
-              type="password"
-              value={this.state.password}
-              onChange={this.handlePasswordChange}
-            />
-          </div>
-          <button type="submit">Registrarse</button>
-        </form>
-      </div>
+      <form onSubmit={this.handleSubmit}>
+        <input
+          type="text"
+          name="nombrecompleto"
+          placeholder="Nombre Completo"
+          onChange={this.handleInputChange}
+        />
+        <input
+          type="email"
+          name="correo"
+          placeholder="Correo Electrónico"
+          onChange={this.handleInputChange}
+        />
+        <input
+          type="password"
+          name="contrasenia"
+          placeholder="Contraseña"
+          onChange={this.handleInputChange}
+        />
+        <button type="submit">Registrar</button>
+      </form>
     );
   }
 }
 
-export default Register;
+export default Formulario;
